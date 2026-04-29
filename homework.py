@@ -61,9 +61,46 @@ def create_items(items_to_create):
     return new_items
 
 def layout_items(items_to_layout):
-    pass
+    no_of_gaps = len(items_to_layout)+1
+    gap_size = WIDTH/no_of_gaps
+    random.shuffle(items_to_layout)
+    for index, item in enumerate(items_to_layout):
+        new_x_pos = (index + 1) * gap_size
+        item.x = new_x_pos
 
 def animate_items(items_to_animate):
-    pass
+    global animations
+    for item in items_to_animate:
+        duration = START_SPEED - current_level
+        animation = animate(item,duration=duration,on_finished=handle_game_over,y=HEIGHT)
+        animations.append(animation)
+
+def handle_game_over():
+    global game_over
+    game_over = True
+
+def on_mouse_down(pos):
+    global items
+    for item in items:
+        if item.collidepoint(pos):
+            if "axe" in item.image:
+                handle_game_complete()
+            else:
+                handle_game_over()
+
+def handle_game_complete():
+    global current_level,items,animations,game_complete
+    stop_animations(animations)
+    if current_level == FINAL_LEVEL:
+        game_complete = True
+    else:
+        current_level += 1
+        items = []
+        animations = []
+
+def stop_animations(animations_to_stop):
+    for animation in animations_to_stop:
+        if animation.running:
+            animation.stop()
 
 pgzrun.go()
